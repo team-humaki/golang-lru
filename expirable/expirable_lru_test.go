@@ -401,8 +401,7 @@ func TestLoadingExpired(t *testing.T) {
 		}
 	}
 
-	// Wait for the expiration reaper without assuming a fixed sleep is enough
-	// on single-CPU builders (#236).
+	// Wait for the expiration reaper
 	deadline := time.Now().Add(2 * time.Second)
 	for lc.Len() != 0 {
 		if time.Now().After(deadline) {
