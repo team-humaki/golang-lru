@@ -401,9 +401,14 @@ func TestLoadingExpired(t *testing.T) {
 		}
 	}
 
-	time.Sleep(time.Millisecond * 100) // wait for expiration reaper
-	if lc.Len() != 0 {
-		t.Fatalf("length differs from expected")
+	// Wait for the expiration reaper without assuming a fixed sleep is enough
+	// on single-CPU builders (#236).
+	deadline := time.Now().Add(2 * time.Second)
+	for lc.Len() != 0 {
+		if time.Now().After(deadline) {
+			t.Fatalf("length differs from expected: still %d after waiting for reaper", lc.Len())
+		}
+		time.Sleep(time.Millisecond * 10)
 	}
 
 	v, ok = lc.Peek("key1")
